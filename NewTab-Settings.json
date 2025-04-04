@@ -1,0 +1,100 @@
+{
+  "settings": {
+    "theme": "dark",
+    "customTheme": {
+      "primary": "#0004ff",
+      "secondary": "#8b5cf6",
+      "accent": "#ec4899"
+    },
+    "bgType": "image",
+    "bgImage": "https://ts1.tc.mm.bing.net/th/id/R-C.3a5f08d35f865e20572b47bcdb21aa78?rik=yqFQsYBCuFslaA&riu=http%3a%2f%2fimg.likebizhi.com%2fuploads%2flikebizhi%2fup%2f2022%2f02%2ffc11dc48c06967a810182d76a45ccdf3321.png&ehk=TZx%2fC4aFoCGFLSw3IZRQimcUF3%2fgXtLlxDpTRhL%2fi04%3d&risl=&pid=ImgRaw&r=0",
+    "fontFamily": "'Roboto', 'Noto Sans SC', sans-serif",
+    "layoutMode": "list",
+    "enabledModules": [
+      "time",
+      "search",
+      "links",
+      "weather",
+      "todo",
+      "note",
+      "quote",
+      "stats"
+    ],
+    "animations": true,
+    "language": "zh-CN",
+    "dragEnabled": true,
+    "cardOrder": [
+      "search",
+      "time",
+      "todo",
+      "note",
+      "quote",
+      "links",
+      "stats",
+      "weather"
+    ]
+  },
+  "quickLinks": [
+    {
+      "name": "Gmail",
+      "url": "https://mail.google.com",
+      "icon": "envelope"
+    },
+    {
+      "name": "YouTube",
+      "url": "https://youtube.com",
+      "icon": "play"
+    },
+    {
+      "name": "GitHub",
+      "url": "https://github.com",
+      "icon": "code-branch"
+    },
+    {
+      "name": "Twitter",
+      "url": "https://twitter.com",
+      "icon": "comment"
+    },
+    {
+      "name": "Reddit",
+      "url": "https://reddit.com",
+      "icon": "newspaper"
+    },
+    {
+      "name": "知乎",
+      "url": "https://zhihu.com",
+      "icon": "question-circle"
+    },
+    {
+      "name": "B站",
+      "url": "https://bilibili.com",
+      "icon": "tv"
+    },
+    {
+      "name": "网易云",
+      "url": "https://music.163.com",
+      "icon": "music"
+    },
+    {
+      "name": "Github",
+      "url": "https://github.com/",
+      "icon": "code"
+    }
+  ],
+  "todos": [
+    {
+      "text": "好好活着",
+      "completed": false
+    }
+  ],
+  "note": "",
+  "stats": {
+    "daysUsed": 1,
+    "tasksCompleted": 10,
+    "linksAdded": 9,
+    "searchesMade": 20,
+    "lastUsed": "2025-04-04"
+  },
+  "currentSearchEngine": "https://www.bing.com/search?q=",
+  "exportDate": "2025-04-04T12:21:30.838Z"
+}

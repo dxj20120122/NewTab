@@ -1,0 +1,2584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab - 你的智能起始页</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* 默认主题变量 */
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-main: 'Inter', 'Noto Sans SC', sans-serif;
+            --font-mono: 'SF Mono', 'Roboto Mono', monospace;
+        }
+
+        /* 暗色主题 */
+        .theme-dark {
+            --primary: #818cf8;
+            --secondary: #a78bfa;
+            --accent: #f472b6;
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 其他预设主题类 */
+        .theme-nature {
+            --primary: #10b981;
+            --secondary: #059669;
+            --accent: #d946ef;
+        }
+
+        .theme-ocean {
+            --primary: #0ea5e9;
+            --secondary: #0284c7;
+            --accent: #f59e0b;
+        }
+
+        .theme-midnight {
+            --primary: #8b5cf6;
+            --secondary: #7c3aed;
+            --accent: #ec4899;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: var(--transition);
+            background-image: var(--bg-image, none);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* 布局容器 */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 设置按钮 */
+        .settings-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .settings-btn:hover {
+            background-color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            align-content: start;
+            transition: var(--transition);
+        }
+
+        /* 网格布局 */
+        .grid-layout {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+
+        /* 列表布局 */
+        .list-layout {
+            grid-template-columns: 1fr;
+        }
+
+        /* 紧凑布局 */
+        .compact-layout {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        /* 可拖动卡片 */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            cursor: move;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .card-action-btn:hover {
+            color: var(--primary);
+        }
+
+        /* 时间日期卡片 */
+        .time-card .time {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-family: var(--font-mono);
+        }
+
+        .time-card .date {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        .time-card .greeting {
+            margin-top: 10px;
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        /* 搜索卡片 */
+        .search-card .search-box {
+            width: 90%;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 2px solid var(--primary);
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text);
+            transition: var(--transition);
+            margin-bottom: 10px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        .search-engines {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .search-engine {
+            padding: 4px 12px;
+            border-radius: 20px;
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .search-engine:hover,
+        .search-engine.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* 快速链接卡片 */
+        .quick-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+        }
+
+        .quick-links-grid.edit-mode {
+            border: 2px dashed var(--primary);
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-3px);
+            color: var(--primary);
+        }
+
+        .link-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .quick-link:hover .link-icon {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .link-name {
+            font-size: 0.8rem;
+            text-align: center;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        .link-delete {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--accent);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .edit-mode .link-delete {
+            opacity: 1;
+        }
+
+        .add-link {
+            cursor: pointer;
+        }
+
+        .add-link .link-icon {
+            background-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .add-link:hover .link-icon {
+            background-color: var(--primary);
+        }
+
+        /* 天气卡片 */
+        .weather-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .weather-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            text-align: center;
+        }
+
+        .weather-details {
+            flex: 1;
+        }
+
+        .weather-temp {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .weather-desc {
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .weather-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* 待办事项卡片 */
+        .todo-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .todo-checkbox {
+            margin-right: 10px;
+            accent-color: var(--primary);
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+
+        .todo-text.completed {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .todo-delete {
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .todo-delete:hover {
+            color: var(--accent);
+        }
+
+        .todo-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .todo-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+
+        /* 笔记卡片 */
+        .note-content {
+            min-height: 150px;
+            width: 90%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .note-content:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        /* 名言卡片 */
+        .quote-content {
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .quote-author {
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* 拖拽占位符样式 */
+        .card-placeholder {
+            border: 2px dashed var(--primary);
+            background-color: rgba(99, 102, 241, 0.05);
+            border-radius: var(--border-radius);
+        }
+
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--card-shadow);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+        }
+
+        .settings-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+        }
+
+        .settings-sidebar {
+            position: sticky;
+            top: 0;
+        }
+
+        .settings-group {
+            margin-bottom: 25px;
+        }
+
+        .settings-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-option {
+            margin-bottom: 15px;
+        }
+
+        .settings-label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        select,
+        input[type="text"],
+        input[type="color"],
+        input[type="range"] {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            transition: var(--transition);
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .color-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-left: 8px;
+            vertical-align: middle;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(18px);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .export-import-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .export-import-btns .btn {
+            flex: 1;
+        }
+
+        #settingsFile {
+            display: none;
+        }
+
+        .drag-hint {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            }
+
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-sidebar {
+                position: static;
+                margin-bottom: 20px;
+            }
+
+            .export-import-btns {
+                flex-direction: column;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .animate {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.4s;
+        }
+
+        /* 吐司通知样式 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--card-bg);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 时间卡片 -->
+            <div class="card time-card animate" data-module="time">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="far fa-clock"></i> <span data-translate="timeModule">时间</span></h3>
+                    <div class="card-actions">
+                        <button class="card-action-btn"><i class="fas fa-cog"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="time" id="currentTime">00:00:00</div>
+                <div class="date" id="currentDate">2023年1月1日 星期一</div>
+                <div class="greeting" id="greeting">下午好，用户！</div>
+                <div id="userLocation" style="margin-top: 8px; font-size: 0.9rem; color: var(--text-light);"><i
+                        class="fas fa-map-marker-alt" style="margin-right: 5px;"></i>正在获取位置...</div>
+            </div>
+
+            <!-- 搜索卡片 -->
+            <div class="card search-card animate delay-1" data-module="search">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-search"></i> <span data-translate="searchModule">搜索</span>
+                    </h3>
+                    <div class="card-actions">
+                        <button class="card-action-btn"><i class="fas fa-cog"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <input type="text" class="search-box" id="searchInput" placeholder="搜索或输入网址...">
+                <div class="search-engines">
+                    <div class="search-engine" data-engine="https://www.google.com/search?q="><i
+                            class="fab fa-google"></i> Google</div>
+                    <div class="search-engine" data-engine="https://www.bing.com/search?q="><i
+                            class="fab fa-microsoft"></i> Bing</div>
+                    <div class="search-engine" data-engine="https://www.baidu.com/s?wd="><i class="fab fa-baidu"></i> 百度
+                    </div>
+                    <div class="search-engine" data-engine="https://duckduckgo.com/?q="><i class="fas fa-search"></i>
+                        DuckDuckGo</div>
+                    <div class="search-engine" data-engine="https://search.brave.com/search?q="><i
+                            class="fas fa-search"></i> Brave</div>
+                    <div class="search-engine" data-engine="https://www.zhihu.com/search?q="><i
+                            class="fas fa-question-circle"></i> 知乎</div>
+                    <div class="search-engine" data-engine="https://search.bilibili.com/all?keyword="><i
+                            class="fas fa-tv"></i> B站</div>
+                </div>
+            </div>
+
+            <!-- 快速链接卡片 -->
+            <div class="card animate delay-2" data-module="links">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-link"></i> <span data-translate="linksModule">快速链接</span>
+                    </h3>
+                    <div class="card-actions">
+                        <button class="card-action-btn" id="editLinksBtn"><i class="fas fa-edit"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-cog"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="quick-links-grid" id="quickLinksContainer">
+                    <!-- 动态生成快速链接 -->
+                </div>
+            </div>
+
+            <!-- 天气卡片 -->
+            <div class="card animate delay-1" data-module="weather">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-cloud-sun"></i> <span
+                            data-translate="weatherModule">天气</span></h3>
+                    <div class="card-actions">
+                        <button class="card-action-btn" id="refreshWeatherBtn"><i class="fas fa-sync-alt"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-cog"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="weather-info" id="weatherContainer">
+                    <div class="weather-icon"><i class="fas fa-cloud-sun"></i></div>
+                    <div class="weather-details">
+                        <div class="weather-temp">22°C</div>
+                        <div class="weather-desc">局部多云</div>
+                        <div class="weather-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="weatherLocation">北京, 中国</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 待办事项卡片 -->
+            <div class="card animate delay-3" data-module="todo">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-tasks"></i> <span data-translate="todoModule">待办事项</span>
+                    </h3>
+                    <div class="card-actions">
+                        <button class="card-action-btn" id="clearCompletedBtn"><i
+                                class="fas fa-check-double"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-cog"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="todo-list" id="todoListContainer">
+                    <!-- 动态生成待办事项 -->
+                </div>
+                <div class="todo-input">
+                    <input type="text" id="newTodoInput" placeholder="添加新任务...">
+                    <button class="btn" id="addTodoBtn"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+
+            <!-- 笔记卡片 -->
+            <div class="card animate delay-2" data-module="note">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-sticky-note"></i> <span
+                            data-translate="noteModule">快速笔记</span></h3>
+                    <div class="card-actions">
+                        <button class="card-action-btn" id="saveNoteBtn"><i class="fas fa-save"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-cog"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <textarea class="note-content" id="quickNote" placeholder="记录你的想法..."></textarea>
+            </div>
+
+            <!-- 每日一句卡片 -->
+            <div class="card animate delay-4" data-module="quote" style="display: none;">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-quote-left"></i> <span
+                            data-translate="quoteModule">每日一句</span></h3>
+                    <div class="card-actions">
+                        <button class="card-action-btn" id="newQuoteBtn"><i class="fas fa-random"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-cog"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="quote-content" id="dailyQuote">
+                    "Stay hungry, stay foolish."
+                </div>
+                <div class="quote-author" id="quoteAuthor">
+                    — Steve Jobs
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="card animate delay-3" data-module="stats" style="display: none;">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-chart-bar"></i> <span
+                            data-translate="statsModule">使用统计</span></h3>
+                    <div class="card-actions">
+                        <button class="card-action-btn"><i class="fas fa-sync-alt"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-cog"></i></button>
+                        <button class="card-action-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="daysUsed">0</div>
+                        <div class="stat-label" data-translate="daysUsed">使用天数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="tasksCompleted">0</div>
+                        <div class="stat-label" data-translate="tasksCompleted">完成任务</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="linksAdded">0</div>
+                        <div class="stat-label" data-translate="linksAdded">添加链接</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="searchesMade">0</div>
+                        <div class="stat-label" data-translate="searchesMade">搜索次数</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 设置按钮 -->
+    <div class="settings-btn" id="settingsBtn">
+        <i class="fas fa-cog"></i>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-cog"></i> <span data-translate="settings">个性化设置</span></h2>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+
+            <div class="settings-container">
+                <div class="settings-sidebar">
+                    <div class="settings-group">
+                        <h3 class="settings-title"><i class="fas fa-palette"></i> <span
+                                data-translate="appearance">外观</span></h3>
+
+                        <div class="settings-option">
+                            <label class="settings-label" data-translate="themePreset">主题预设</label>
+                            <select id="themePreset">
+                                <option value="default" data-translate="defaultTheme">默认</option>
+                                <option value="dark" data-translate="darkTheme">暗色</option>
+                                <option value="nature" data-translate="natureTheme">自然</option>
+                                <option value="ocean" data-translate="oceanTheme">海洋</option>
+                                <option value="midnight" data-translate="midnightTheme">午夜</option>
+                                <option value="custom" data-translate="customTheme">自定义</option>
+                            </select>
+                        </div>
+
+                        <div class="settings-option" id="customThemeOptions" style="display: none;">
+                            <label class="settings-label" data-translate="primaryColor">主色 <span class="color-preview"
+                                    style="background-color: var(--primary);"></span></label>
+                            <input type="color" id="primaryColor" value="#6366f1">
+
+                            <label class="settings-label" data-translate="secondaryColor">次色 <span class="color-preview"
+                                    style="background-color: var(--secondary);"></span></label>
+                            <input type="color" id="secondaryColor" value="#8b5cf6">
+
+                            <label class="settings-label" data-translate="accentColor">强调色 <span class="color-preview"
+                                    style="background-color: var(--accent);"></span></label>
+                            <input type="color" id="accentColor" value="#ec4899">
+                        </div>
+
+                        <div class="settings-option">
+                            <label class="settings-label" data-translate="bgType">背景类型</label>
+                            <select id="bgType">
+                                <option value="color" data-translate="solidColor">纯色</option>
+                                <option value="gradient" data-translate="gradient">渐变</option>
+                                <option value="image" data-translate="image">图片</option>
+                                <option value="dynamic" data-translate="dynamic">动态壁纸</option>
+                            </select>
+                        </div>
+
+                        <div class="settings-option" id="bgImageOptions" style="display: none;">
+                            <label class="settings-label" data-translate="bgImageUrl">背景图片URL</label>
+                            <input type="text" id="bgImageUrl" placeholder="https://example.com/image.jpg">
+                            <button class="btn btn-outline" id="uploadBgBtn" style="margin-top: 8px; width: 100%;">
+                                <i class="fas fa-upload"></i> <span data-translate="uploadImage">上传图片</span>
+                            </button>
+                        </div>
+
+                        <div class="settings-option">
+                            <label class="settings-label" data-translate="fontFamily">字体</label>
+                            <select id="fontFamily">
+                                <option value="Inter, Noto Sans SC, sans-serif">Inter (默认)</option>
+                                <option value="'Segoe UI', system-ui, sans-serif">Segoe UI</option>
+                                <option value="'Helvetica Neue', Arial, sans-serif">Helvetica</option>
+                                <option value="'Roboto', 'Noto Sans SC', sans-serif">Roboto</option>
+                                <option value="'Georgia', serif">Georgia</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-main">
+                    <div class="settings-group">
+                        <h3 class="settings-title"><i class="fas fa-th-large"></i> <span
+                                data-translate="layout">布局</span></h3>
+
+                        <div class="settings-option">
+                            <label class="settings-label" data-translate="layoutMode">布局模式</label>
+                            <select id="layoutMode">
+                                <option value="grid" data-translate="gridLayout">网格</option>
+                                <option value="list" data-translate="listLayout">列表</option>
+                                <option value="compact" data-translate="compactLayout">紧凑</option>
+                            </select>
+                            <script>
+                                document.getElementById('layoutMode').addEventListener('change', function () {
+                                    const layout = this.value;
+                                    const mainContent = document.querySelector('.main-content');
+
+                                    // 移除所有布局类
+                                    mainContent.classList.remove('grid-layout', 'list-layout', 'compact-layout');
+
+                                    // 添加选中的布局类
+                                    mainContent.classList.add(layout + '-layout');
+
+                                    // 保存到本地存储
+                                    localStorage.setItem('layoutMode', layout);
+                                });
+
+                                // 初始化时应用保存的布局
+                                const savedLayout = localStorage.getItem('layoutMode') || 'grid';
+                                document.getElementById('layoutMode').value = savedLayout;
+                                document.querySelector('.main-content').classList.add(savedLayout + '-layout');
+                            </script>
+                        </div>
+
+                        <div class="settings-option">
+                            <label class="settings-label" data-translate="visibleModules">显示模块</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <label><input type="checkbox" class="module-toggle" value="time" checked> <span
+                                        data-translate="timeModule">时间</span></label>
+                                <label><input type="checkbox" class="module-toggle" value="search" checked> <span
+                                        data-translate="searchModule">搜索</span></label>
+                                <label><input type="checkbox" class="module-toggle" value="links" checked> <span
+                                        data-translate="linksModule">快速链接</span></label>
+                                <label><input type="checkbox" class="module-toggle" value="weather" checked> <span
+                                        data-translate="weatherModule">天气</span></label>
+                                <label><input type="checkbox" class="module-toggle" value="todo" checked> <span
+                                        data-translate="todoModule">待办事项</span></label>
+                                <label><input type="checkbox" class="module-toggle" value="note" checked> <span
+                                        data-translate="noteModule">笔记</span></label>
+                                <label><input type="checkbox" class="module-toggle" value="quote"> <span
+                                        data-translate="quoteModule">每日一句</span></label>
+                                <label><input type="checkbox" class="module-toggle" value="stats"> <span
+                                        data-translate="statsModule">统计</span></label>
+                            </div>
+                        </div>
+
+                        <div class="settings-option">
+                            <label class="settings-label" data-translate="dragEnabled">启用拖拽排序</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="dragEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3 class="settings-title"><i class="fas fa-sliders-h"></i> <span
+                                data-translate="otherSettings">其他设置</span></h3>
+
+                        <div class="settings-option">
+                            <label class="settings-label" data-translate="animations">动画效果</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="animationsEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="settings-option">
+                            <label class="settings-label" data-translate="language">语言</label>
+                            <select id="language">
+                                <option value="zh-CN">简体中文</option>
+                                <option value="en-US">English</option>
+                                <option value="ja-JP">日本語</option>
+                                <option value="ko-KR">한국어</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <button class="btn" id="saveSettingsBtn" style="width: 100%; margin-top: 20px;">
+                            <i class="fas fa-save"></i> <span data-translate="saveSettings">保存设置</span>
+                        </button>
+
+                        <button class="btn btn-outline" id="resetSettingsBtn" style="width: 100%; margin-top: 10px;">
+                            <i class="fas fa-undo"></i> <span data-translate="resetSettings">恢复默认</span>
+                        </button>
+
+                        <div class="export-import-btns">
+                            <button class="btn btn-outline" id="exportSettingsBtn">
+                                <i class="fas fa-file-export"></i> <span data-translate="exportSettings">导出</span>
+                            </button>
+                            <button class="btn btn-outline" id="importSettingsBtn">
+                                <i class="fas fa-file-import"></i> <span data-translate="importSettings">导入</span>
+                            </button>
+                            <input type="file" id="settingsFile" accept=".json">
+                        </div>
+                        <p class="drag-hint" data-translate="dragHint">拖拽JSON文件到页面也可导入设置</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局配置对象
+        const config = {
+            // 默认设置
+            settings: {
+                theme: 'default',
+                customTheme: {
+                    primary: '#6366f1',
+                    secondary: '#8b5cf6',
+                    accent: '#ec4899'
+                },
+                bgType: 'color',
+                bgImage: '',
+                fontFamily: 'Inter, Noto Sans SC, sans-serif',
+                layoutMode: 'grid',
+                enabledModules: ['time', 'search', 'links', 'weather', 'todo', 'note'],
+                animations: true,
+                language: 'zh-CN',
+                dragEnabled: true,
+                cardOrder: ['time', 'search', 'links', 'weather', 'todo', 'note', 'quote', 'stats']
+            },
+
+            // 用户数据
+            quickLinks: [
+                { name: 'Gmail', url: 'https://mail.google.com', icon: 'envelope' },
+                { name: 'YouTube', url: 'https://youtube.com', icon: 'play' },
+                { name: 'GitHub', url: 'https://github.com', icon: 'code-branch' },
+                { name: 'Twitter', url: 'https://twitter.com', icon: 'comment' },
+                { name: 'Reddit', url: 'https://reddit.com', icon: 'newspaper' },
+                { name: '知乎', url: 'https://zhihu.com', icon: 'question-circle' },
+                { name: 'B站', url: 'https://bilibili.com', icon: 'tv' },
+                { name: '网易云', url: 'https://music.163.com', icon: 'music' }
+            ],
+            todos: [
+                { text: '完成新标签页开发', completed: false },
+                { text: '添加天气API支持', completed: false },
+                { text: '优化移动端体验', completed: true }
+            ],
+            note: '这是我的快速笔记...',
+            stats: {
+                daysUsed: 1,
+                tasksCompleted: 0,
+                linksAdded: 8,
+                searchesMade: 0,
+                lastUsed: new Date().toISOString().split('T')[0]
+            },
+            currentSearchEngine: 'https://www.google.com/search?q='
+        };
+
+        // 语言翻译字典
+        const translations = {
+            'zh-CN': {
+                settings: '个性化设置',
+                appearance: '外观',
+                themePreset: '主题预设',
+                defaultTheme: '默认',
+                darkTheme: '暗色',
+                natureTheme: '自然',
+                oceanTheme: '海洋',
+                midnightTheme: '午夜',
+                customTheme: '自定义',
+                primaryColor: '主色',
+                secondaryColor: '次色',
+                accentColor: '强调色',
+                bgType: '背景类型',
+                solidColor: '纯色',
+                gradient: '渐变',
+                image: '图片',
+                dynamic: '动态壁纸',
+                bgImageUrl: '背景图片URL',
+                uploadImage: '上传图片',
+                fontFamily: '字体',
+                layout: '布局',
+                layoutMode: '布局模式',
+                gridLayout: '网格',
+                listLayout: '列表',
+                compactLayout: '紧凑',
+                visibleModules: '显示模块',
+                timeModule: '时间',
+                searchModule: '搜索',
+                linksModule: '快速链接',
+                weatherModule: '天气',
+                todoModule: '待办事项',
+                noteModule: '笔记',
+                quoteModule: '每日一句',
+                statsModule: '统计',
+                dragEnabled: '启用拖拽排序',
+                otherSettings: '其他设置',
+                animations: '动画效果',
+                language: '语言',
+                saveSettings: '保存设置',
+                resetSettings: '恢复默认',
+                exportSettings: '导出',
+                importSettings: '导入',
+                dragHint: '拖拽JSON文件到页面也可导入设置',
+                searchPlaceholder: '搜索或输入网址...',
+                addTaskPlaceholder: '添加新任务...',
+                notePlaceholder: '记录你的想法...',
+                daysUsed: '使用天数',
+                tasksCompleted: '完成任务',
+                linksAdded: '添加链接',
+                searchesMade: '搜索次数',
+                greetings: {
+                    morning: '早上好',
+                    afternoon: '下午好',
+                    evening: '晚上好',
+                    night: '深夜好'
+                },
+                addLink: '添加链接',
+                addQuickLink: '添加快捷链接',
+                linkName: '名称',
+                linkUrl: 'URL',
+                linkIcon: '图标',
+                website: '网站',
+                email: '邮件',
+                video: '视频',
+                music: '音乐',
+                shopping: '购物',
+                games: '游戏',
+                news: '新闻',
+                development: '开发',
+                cancel: '取消',
+                confirm: '确认',
+                settingsSaved: '设置已保存！',
+                settingsReset: '已恢复默认设置！',
+                settingsExportSuccess: '设置导出成功！',
+                settingsImportSuccess: '设置导入成功！',
+                settingsImportFailed: '导入设置失败，文件格式不正确',
+                noteSaved: '笔记已保存！',
+                weatherUpdating: '正在更新天气...',
+                weatherFailed: '获取天气信息失败',
+                invalidLink: '请填写名称和URL'
+            },
+            'en-US': {
+                settings: 'Personalization',
+                appearance: 'Appearance',
+                themePreset: 'Theme Preset',
+                defaultTheme: 'Default',
+                darkTheme: 'Dark',
+                natureTheme: 'Nature',
+                oceanTheme: 'Ocean',
+                midnightTheme: 'Midnight',
+                customTheme: 'Custom',
+                primaryColor: 'Primary Color',
+                secondaryColor: 'Secondary Color',
+                accentColor: 'Accent Color',
+                bgType: 'Background Type',
+                solidColor: 'Solid Color',
+                gradient: 'Gradient',
+                image: 'Image',
+                dynamic: 'Dynamic Wallpaper',
+                bgImageUrl: 'Background Image URL',
+                uploadImage: 'Upload Image',
+                fontFamily: 'Font Family',
+                layout: 'Layout',
+                layoutMode: 'Layout Mode',
+                gridLayout: 'Grid',
+                listLayout: 'List',
+                compactLayout: 'Compact',
+                visibleModules: 'Visible Modules',
+                timeModule: 'Time',
+                searchModule: 'Search',
+                linksModule: 'Quick Links',
+                weatherModule: 'Weather',
+                todoModule: 'To-Do',
+                noteModule: 'Note',
+                quoteModule: 'Daily Quote',
+                statsModule: 'Statistics',
+                dragEnabled: 'Enable Drag & Drop',
+                otherSettings: 'Other Settings',
+                animations: 'Animations',
+                language: 'Language',
+                saveSettings: 'Save Settings',
+                resetSettings: 'Reset to Default',
+                exportSettings: 'Export',
+                importSettings: 'Import',
+                dragHint: 'Drag & drop JSON file to import settings',
+                searchPlaceholder: 'Search or enter URL...',
+                addTaskPlaceholder: 'Add a new task...',
+                notePlaceholder: 'Write your thoughts...',
+                daysUsed: 'Days Used',
+                tasksCompleted: 'Tasks Completed',
+                linksAdded: 'Links Added',
+                searchesMade: 'Searches Made',
+                greetings: {
+                    morning: 'Good morning',
+                    afternoon: 'Good afternoon',
+                    evening: 'Good evening',
+                    night: 'Good night'
+                },
+                addLink: 'Add Link',
+                addQuickLink: 'Add Quick Link',
+                linkName: 'Name',
+                linkUrl: 'URL',
+                linkIcon: 'Icon',
+                website: 'Website',
+                email: 'Email',
+                video: 'Video',
+                music: 'Music',
+                shopping: 'Shopping',
+                games: 'Games',
+                news: 'News',
+                development: 'Development',
+                cancel: 'Cancel',
+                confirm: 'Confirm',
+                settingsSaved: 'Settings saved!',
+                settingsReset: 'Settings reset to default!',
+                settingsExportSuccess: 'Settings exported successfully!',
+                settingsImportSuccess: 'Settings imported successfully!',
+                settingsImportFailed: 'Failed to import settings, invalid file format',
+                noteSaved: 'Note saved!',
+                weatherUpdating: 'Updating weather...',
+                weatherFailed: 'Failed to get weather',
+                invalidLink: 'Please enter name and URL'
+            },
+            'ja-JP': {
+                settings: '個人設定',
+                appearance: '外観',
+                themePreset: 'テーマプリセット',
+                defaultTheme: 'デフォルト',
+                darkTheme: 'ダーク',
+                natureTheme: '自然',
+                oceanTheme: '海',
+                midnightTheme: 'ミッドナイト',
+                customTheme: 'カスタム',
+                primaryColor: 'プライマリカラー',
+                secondaryColor: 'セカンダリカラー',
+                accentColor: 'アクセントカラー',
+                bgType: '背景タイプ',
+                solidColor: '単色',
+                gradient: 'グラデーション',
+                image: '画像',
+                dynamic: '動的壁紙',
+                bgImageUrl: '背景画像URL',
+                uploadImage: '画像をアップロード',
+                fontFamily: 'フォント',
+                layout: 'レイアウト',
+                layoutMode: 'レイアウトモード',
+                gridLayout: 'グリッド',
+                listLayout: 'リスト',
+                compactLayout: 'コンパクト',
+                visibleModules: '表示モジュール',
+                timeModule: '時間',
+                searchModule: '検索',
+                linksModule: 'クイックリンク',
+                weatherModule: '天気',
+                todoModule: 'ToDo',
+                noteModule: 'ノート',
+                quoteModule: '日替わり名言',
+                statsModule: '統計',
+                dragEnabled: 'ドラッグ＆ドロップを有効にする',
+                otherSettings: 'その他の設定',
+                animations: 'アニメーション',
+                language: '言語',
+                saveSettings: '設定を保存',
+                resetSettings: 'デフォルトに戻す',
+                exportSettings: 'エクスポート',
+                importSettings: 'インポート',
+                dragHint: 'JSONファイルをドラッグ＆ドロップして設定をインポート',
+                searchPlaceholder: '検索またはURLを入力...',
+                addTaskPlaceholder: '新しいタスクを追加...',
+                notePlaceholder: '考えを書いてください...',
+                daysUsed: '使用日数',
+                tasksCompleted: '完了したタスク',
+                linksAdded: '追加されたリンク',
+                searchesMade: '検索回数',
+                greetings: {
+                    morning: 'おはようございます',
+                    afternoon: 'こんにちは',
+                    evening: 'こんばんは',
+                    night: 'おやすみなさい'
+                },
+                addLink: 'リンクを追加',
+                addQuickLink: 'クイックリンクを追加',
+                linkName: '名前',
+                linkUrl: 'URL',
+                linkIcon: 'アイコン',
+                website: 'ウェブサイト',
+                email: 'メール',
+                video: 'ビデオ',
+                music: '音楽',
+                shopping: 'ショッピング',
+                games: 'ゲーム',
+                news: 'ニュース',
+                development: '開発',
+                cancel: 'キャンセル',
+                confirm: '確認',
+                settingsSaved: '設定を保存しました！',
+                settingsReset: 'デフォルト設定に戻しました！',
+                settingsExportSuccess: '設定のエクスポートに成功しました！',
+                settingsImportSuccess: '設定のインポートに成功しました！',
+                settingsImportFailed: '設定のインポートに失敗しました、ファイル形式が無効です',
+                noteSaved: 'ノートを保存しました！',
+                weatherUpdating: '天気を更新中...',
+                weatherFailed: '天気情報の取得に失敗しました',
+                invalidLink: '名前とURLを入力してください'
+            },
+            'ko-KR': {
+                settings: '개인 설정',
+                appearance: '외관',
+                themePreset: '테마 프리셋',
+                defaultTheme: '기본',
+                darkTheme: '다크',
+                natureTheme: '자연',
+                oceanTheme: '바다',
+                midnightTheme: '미드나이트',
+                customTheme: '사용자 정의',
+                primaryColor: '기본 색상',
+                secondaryColor: '보조 색상',
+                accentColor: '강조 색상',
+                bgType: '배경 유형',
+                solidColor: '단색',
+                gradient: '그라데이션',
+                image: '이미지',
+                dynamic: '동적 배경화면',
+                bgImageUrl: '배경 이미지 URL',
+                uploadImage: '이미지 업로드',
+                fontFamily: '글꼴',
+                layout: '레이아웃',
+                layoutMode: '레이아웃 모드',
+                gridLayout: '그리드',
+                listLayout: '목록',
+                compactLayout: '컴팩트',
+                visibleModules: '표시 모듈',
+                timeModule: '시간',
+                searchModule: '검색',
+                linksModule: '빠른 링크',
+                weatherModule: '날씨',
+                todoModule: '할 일',
+                noteModule: '메모',
+                quoteModule: '오늘의 명언',
+                statsModule: '통계',
+                dragEnabled: '드래그 앤 드롭 활성화',
+                otherSettings: '기타 설정',
+                animations: '애니메이션',
+                language: '언어',
+                saveSettings: '설정 저장',
+                resetSettings: '기본값으로 재설정',
+                exportSettings: '내보내기',
+                importSettings: '가져오기',
+                dragHint: 'JSON 파일을 드래그 앤 드롭하여 설정 가져오기',
+                searchPlaceholder: '검색 또는 URL 입력...',
+                addTaskPlaceholder: '새 작업 추가...',
+                notePlaceholder: '생각을 적어보세요...',
+                daysUsed: '사용 일수',
+                tasksCompleted: '완료된 작업',
+                linksAdded: '추가된 링크',
+                searchesMade: '검색 횟수',
+                greetings: {
+                    morning: '좋은 아침입니다',
+                    afternoon: '안녕하세요',
+                    evening: '안녕하세요',
+                    night: '안녕히 주무세요'
+                },
+                addLink: '링크 추가',
+                addQuickLink: '빠른 링크 추가',
+                linkName: '이름',
+                linkUrl: 'URL',
+                linkIcon: '아이콘',
+                website: '웹사이트',
+                email: '이메일',
+                video: '비디오',
+                music: '음악',
+                shopping: '쇼핑',
+                games: '게임',
+                news: '뉴스',
+                development: '개발',
+                cancel: '취소',
+                confirm: '확인',
+                settingsSaved: '설정이 저장되었습니다!',
+                settingsReset: '기본 설정으로 복원되었습니다!',
+                settingsExportSuccess: '설정 내보내기 성공!',
+                settingsImportSuccess: '설정 가져오기 성공!',
+                settingsImportFailed: '설정 가져오기 실패, 파일 형식이 잘못되었습니다',
+                noteSaved: '메모가 저장되었습니다!',
+                weatherUpdating: '날씨 업데이트 중...',
+                weatherFailed: '날씨 정보를 가져오지 못했습니다',
+                invalidLink: '이름과 URL을 입력하세요'
+            }
+        };
+
+        // DOM加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            // 从本地存储加载配置
+            loadSettings();
+
+            // 初始化时间显示
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            // 初始化快速链接
+            renderQuickLinks();
+
+            // 初始化待办事项
+            renderTodos();
+
+            // 初始化笔记
+            document.getElementById('quickNote').value = config.note;
+
+            // 初始化统计
+            updateStats();
+
+            // 初始化搜索引擎
+            initSearchEngines();
+
+            // 设置事件监听
+            setupEventListeners();
+
+            // 应用当前主题
+            applyTheme();
+
+            // 应用动画效果
+            applyAnimations();
+
+            // 初始化拖拽功能
+            if (config.settings.dragEnabled) {
+                initDragAndDrop();
+            }
+
+            // 检查使用天数
+            checkUsageDays();
+
+            // 尝试获取天气信息
+            fetchWeather();
+
+            // 设置拖放导入事件
+            setupDragAndDropImport();
+        });
+
+        // 从本地存储加载设置
+        function loadSettings() {
+            try {
+                const savedSettings = localStorage.getItem('NewTabSettings');
+                const savedData = localStorage.getItem('NewTabData');
+
+                if (savedSettings) {
+                    const parsedSettings = JSON.parse(savedSettings);
+                    // 保留默认值，只覆盖存在的属性
+                    Object.keys(parsedSettings).forEach(key => {
+                        if (config.settings.hasOwnProperty(key)) {
+                            // 特殊处理嵌套对象
+                            if (key === 'customTheme' && typeof parsedSettings[key] === 'object') {
+                                Object.assign(config.settings.customTheme, parsedSettings[key]);
+                            } else {
+                                config.settings[key] = parsedSettings[key];
+                            }
+                        }
+                    });
+                }
+
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    Object.assign(config, parsedData);
+                }
+
+                // 更新UI以反映加载的设置
+                updateSettingsUI();
+
+                // 根据保存的顺序重新排列卡片
+                rearrangeCards();
+            } catch (error) {
+                console.error('加载设置失败:', error);
+                showToast(getTranslation('settingsImportFailed'));
+            }
+        }
+
+        // 更新设置UI以反映当前配置
+        function updateSettingsUI() {
+            // 主题选择
+            document.getElementById('themePreset').value = config.settings.theme;
+            document.getElementById('primaryColor').value = config.settings.customTheme.primary;
+            document.getElementById('secondaryColor').value = config.settings.customTheme.secondary;
+            document.getElementById('accentColor').value = config.settings.customTheme.accent;
+
+            // 显示/隐藏自定义主题选项
+            if (config.settings.theme === 'custom') {
+                document.getElementById('customThemeOptions').style.display = 'block';
+            } else {
+                document.getElementById('customThemeOptions').style.display = 'none';
+            }
+
+            // 背景设置
+            document.getElementById('bgType').value = config.settings.bgType;
+            document.getElementById('bgImageUrl').value = config.settings.bgImage;
+
+            // 显示/隐藏背景图片选项
+            if (config.settings.bgType === 'image' || config.settings.bgType === 'dynamic') {
+                document.getElementById('bgImageOptions').style.display = 'block';
+            } else {
+                document.getElementById('bgImageOptions').style.display = 'none';
+            }
+
+            // 字体选择
+            document.getElementById('fontFamily').value = config.settings.fontFamily;
+
+            // 布局模式
+            document.getElementById('layoutMode').value = config.settings.layoutMode;
+
+            // 模块显示
+            document.querySelectorAll('.module-toggle').forEach(checkbox => {
+                checkbox.checked = config.settings.enabledModules.includes(checkbox.value);
+            });
+
+            // 动画开关
+            document.getElementById('animationsEnabled').checked = config.settings.animations;
+
+            // 语言选择
+            document.getElementById('language').value = config.settings.language;
+
+            // 拖拽开关
+            document.getElementById('dragEnabled').checked = config.settings.dragEnabled;
+
+            // 应用语言设置
+            applyLanguage();
+
+            // 显示/隐藏模块
+            toggleModules();
+        }
+
+        // 获取翻译文本
+        function getTranslation(key) {
+            const lang = config.settings.language;
+            const keys = key.split('.');
+            let result = translations[lang] || translations['zh-CN'];
+
+            for (const k of keys) {
+                result = result[k];
+                if (result === undefined) {
+                    return key; // 如果找不到翻译，返回键名
+                }
+            }
+
+            return result;
+        }
+
+        // 保存设置到本地存储
+        function saveSettings() {
+            try {
+                // 更新卡片顺序
+                updateCardOrder();
+
+                // 更新配置对象
+                config.settings.theme = document.getElementById('themePreset').value;
+                config.settings.customTheme.primary = document.getElementById('primaryColor').value;
+                config.settings.customTheme.secondary = document.getElementById('secondaryColor').value;
+                config.settings.customTheme.accent = document.getElementById('accentColor').value;
+                config.settings.bgType = document.getElementById('bgType').value;
+                config.settings.bgImage = document.getElementById('bgImageUrl').value;
+                config.settings.fontFamily = document.getElementById('fontFamily').value;
+                config.settings.layoutMode = document.getElementById('layoutMode').value;
+                config.settings.animations = document.getElementById('animationsEnabled').checked;
+                config.settings.language = document.getElementById('language').value;
+                config.settings.dragEnabled = document.getElementById('dragEnabled').checked;
+
+                // 更新启用的模块
+                config.settings.enabledModules = [];
+                document.querySelectorAll('.module-toggle:checked').forEach(checkbox => {
+                    config.settings.enabledModules.push(checkbox.value);
+                });
+
+                // 保存到本地存储
+                localStorage.setItem('NewTabSettings', JSON.stringify(config.settings));
+                localStorage.setItem('NewTabData', JSON.stringify({
+                    quickLinks: config.quickLinks,
+                    todos: config.todos,
+                    note: config.note,
+                    stats: config.stats,
+                    currentSearchEngine: config.currentSearchEngine
+                }));
+
+                // 应用新设置
+                applyTheme();
+                applyAnimations();
+                toggleModules();
+                applyLanguage();
+
+                // 显示保存成功的提示
+                showToast(getTranslation('settingsSaved'));
+            } catch (error) {
+                console.error('保存设置失败:', error);
+                showToast(getTranslation('settingsImportFailed'));
+            }
+        }
+
+        // 更新卡片顺序
+        function updateCardOrder() {
+            const container = document.querySelector('.main-content');
+            const cards = Array.from(container.querySelectorAll('.card'));
+            config.settings.cardOrder = cards.map(card => card.getAttribute('data-module'));
+        }
+
+        // 根据保存的顺序重新排列卡片
+        function rearrangeCards() {
+            if (!config.settings.cardOrder || config.settings.cardOrder.length === 0) return;
+
+            const container = document.querySelector('.main-content');
+            const cards = Array.from(container.querySelectorAll('.card'));
+
+            // 创建一个模块到卡片的映射
+            const cardMap = {};
+            cards.forEach(card => {
+                const module = card.getAttribute('data-module');
+                cardMap[module] = card;
+            });
+
+            // 清空容器
+            container.innerHTML = '';
+
+            // 按照保存的顺序添加卡片
+            config.settings.cardOrder.forEach(module => {
+                if (cardMap[module]) {
+                    container.appendChild(cardMap[module]);
+                }
+            });
+
+            // 添加任何新添加的模块（不在保存顺序中的）
+            Object.keys(cardMap).forEach(module => {
+                if (!config.settings.cardOrder.includes(module)) {
+                    container.appendChild(cardMap[module]);
+                }
+            });
+        }
+
+        // 导出设置
+        function exportSettings() {
+            try {
+                // 确保保存当前设置
+                saveSettings();
+
+                // 准备导出的数据
+                const exportData = {
+                    settings: config.settings,
+                    quickLinks: config.quickLinks,
+                    todos: config.todos,
+                    note: config.note,
+                    stats: config.stats,
+                    currentSearchEngine: config.currentSearchEngine,
+                    exportDate: new Date().toISOString()
+                };
+
+                // 创建JSON文件
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+                // 创建下载链接
+                const exportFileDefaultName = `NewTab-Settings-${new Date().toISOString().split('T')[0]}.json`;
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+
+                showToast(getTranslation('settingsExportSuccess'));
+            } catch (error) {
+                console.error('导出设置失败:', error);
+                showToast(getTranslation('settingsImportFailed'));
+            }
+        }
+
+        // 导入设置
+        function importSettings(file) {
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+
+                    // 验证导入的数据结构
+                    if (!importedData.settings || !importedData.quickLinks) {
+                        throw new Error('无效的设置文件');
+                    }
+
+                    // 应用导入的设置
+                    Object.assign(config.settings, importedData.settings || {});
+                    config.quickLinks = importedData.quickLinks || [];
+                    config.todos = importedData.todos || [];
+                    config.note = importedData.note || '';
+                    config.stats = importedData.stats || config.stats;
+                    config.currentSearchEngine = importedData.currentSearchEngine || 'https://www.google.com/search?q=';
+
+                    // 保存到本地存储
+                    localStorage.setItem('NewTabSettings', JSON.stringify(config.settings));
+                    localStorage.setItem('NewTabData', JSON.stringify({
+                        quickLinks: config.quickLinks,
+                        todos: config.todos,
+                        note: config.note,
+                        stats: config.stats,
+                        currentSearchEngine: config.currentSearchEngine
+                    }));
+
+                    // 更新UI
+                    updateSettingsUI();
+
+                    // 重新渲染内容
+                    renderQuickLinks();
+                    renderTodos();
+                    document.getElementById('quickNote').value = config.note;
+                    updateStats();
+
+                    // 应用新设置
+                    applyTheme();
+                    applyAnimations();
+                    toggleModules();
+                    applyLanguage();
+
+                    showToast(getTranslation('settingsImportSuccess'));
+                } catch (error) {
+                    console.error('导入设置失败:', error);
+                    showToast(getTranslation('settingsImportFailed'));
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 设置拖放导入功能
+        function setupDragAndDropImport() {
+            document.body.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            document.body.addEventListener('drop', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].name.endsWith('.json')) {
+                    importSettings(files[0]);
+                }
+            });
+        }
+
+        // 重置为默认设置
+        function resetSettings() {
+            if (confirm(getTranslation('resetSettingsConfirm'))) {
+                try {
+                    // 重置配置对象
+                    config.settings = {
+                        theme: 'default',
+                        customTheme: {
+                            primary: '#6366f1',
+                            secondary: '#8b5cf6',
+                            accent: '#ec4899'
+                        },
+                        bgType: 'color',
+                        bgImage: '',
+                        fontFamily: 'Inter, Noto Sans SC, sans-serif',
+                        layoutMode: 'grid',
+                        enabledModules: ['time', 'search', 'links', 'weather', 'todo', 'note'],
+                        animations: true,
+                        language: 'zh-CN',
+                        dragEnabled: true,
+                        cardOrder: ['time', 'search', 'links', 'weather', 'todo', 'note', 'quote', 'stats']
+                    };
+
+                    // 重置其他数据
+                    config.quickLinks = [
+                        { name: 'Gmail', url: 'https://mail.google.com', icon: 'envelope' },
+                        { name: 'YouTube', url: 'https://youtube.com', icon: 'play' },
+                        { name: 'GitHub', url: 'https://github.com', icon: 'code-branch' },
+                        { name: 'Twitter', url: 'https://twitter.com', icon: 'comment' },
+                        { name: 'Reddit', url: 'https://reddit.com', icon: 'newspaper' },
+                        { name: '知乎', url: 'https://zhihu.com', icon: 'question-circle' },
+                        { name: 'B站', url: 'https://bilibili.com', icon: 'tv' },
+                        { name: '网易云', url: 'https://music.163.com', icon: 'music' }
+                    ];
+
+                    config.todos = [
+                        { text: '完成新标签页开发', completed: false },
+                        { text: '添加天气API支持', completed: false },
+                        { text: '优化移动端体验', completed: true }
+                    ];
+
+                    config.note = '这是我的快速笔记...';
+                    config.stats = {
+                        daysUsed: 1,
+                        tasksCompleted: 0,
+                        linksAdded: 8,
+                        searchesMade: 0,
+                        lastUsed: new Date().toISOString().split('T')[0]
+                    };
+                    config.currentSearchEngine = 'https://www.google.com/search?q=';
+
+                    // 更新UI
+                    updateSettingsUI();
+
+                    // 应用默认设置
+                    applyTheme();
+                    applyAnimations();
+                    toggleModules();
+                    applyLanguage();
+
+                    // 重新渲染内容
+                    renderQuickLinks();
+                    renderTodos();
+
+                    // 显示重置成功的提示
+                    showToast(getTranslation('settingsReset'));
+                } catch (error) {
+                    console.error('重置设置失败:', error);
+                    showToast(getTranslation('settingsImportFailed'));
+                }
+            }
+        }
+
+        // 应用当前主题设置
+        function applyTheme() {
+            // 移除所有主题类
+            document.body.classList.remove('theme-dark', 'theme-nature', 'theme-ocean', 'theme-midnight');
+
+            // 应用选定的主题
+            if (config.settings.theme !== 'default' && config.settings.theme !== 'custom') {
+                document.body.classList.add(`theme-${config.settings.theme}`);
+            }
+
+            // 如果是自定义主题，更新CSS变量
+            if (config.settings.theme === 'custom') {
+                document.documentElement.style.setProperty('--primary', config.settings.customTheme.primary);
+                document.documentElement.style.setProperty('--secondary', config.settings.customTheme.secondary);
+                document.documentElement.style.setProperty('--accent', config.settings.customTheme.accent);
+            }
+
+            // 应用字体
+            document.documentElement.style.setProperty('--font-main', config.settings.fontFamily);
+
+            // 应用背景
+            applyBackground();
+        }
+
+        // 应用背景设置
+        function applyBackground() {
+            switch (config.settings.bgType) {
+                case 'color':
+                    document.body.style.backgroundImage = 'none';
+                    document.body.style.backgroundColor = 'var(--bg)';
+                    break;
+                case 'gradient':
+                    document.body.style.backgroundImage = 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)';
+                    break;
+                case 'image':
+                    if (config.settings.bgImage) {
+                        document.body.style.backgroundImage = `url('${config.settings.bgImage}')`;
+                    }
+                    break;
+                case 'dynamic':
+                    // 这里可以添加动态壁纸逻辑
+                    break;
+            }
+        }
+
+        // 应用动画设置
+        function applyAnimations() {
+            const elements = document.querySelectorAll('.animate');
+            elements.forEach(el => {
+                if (config.settings.animations) {
+                    el.style.animation = 'fadeIn 0.5s ease-out forwards';
+                } else {
+                    el.style.animation = 'none';
+                    el.style.opacity = '1';
+                }
+            });
+        }
+
+        // 显示/隐藏模块
+        function toggleModules() {
+            document.querySelectorAll('[data-module]').forEach(module => {
+                const moduleName = module.getAttribute('data-module');
+                if (config.settings.enabledModules.includes(moduleName)) {
+                    module.style.display = 'block';
+                } else {
+                    module.style.display = 'none';
+                }
+            });
+        }
+
+        // 应用语言设置
+        function applyLanguage() {
+            const lang = config.settings.language;
+            const t = translations[lang] || translations['zh-CN'];
+
+            // 更新所有带有data-translate属性的元素
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+
+            // 更新占位符等属性
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('newTodoInput').placeholder = t.addTaskPlaceholder;
+            document.getElementById('quickNote').placeholder = t.notePlaceholder;
+
+            // 更新统计标签
+            document.querySelectorAll('.stat-label').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+        }
+
+        // 更新时间和日期显示
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            const lang = config.settings.language;
+
+            // 更新时间
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString(lang, {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            // 更新日期
+            document.getElementById('currentDate').textContent = now.toLocaleDateString(lang, {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // 更新问候语
+            const t = translations[lang] || translations['zh-CN'];
+            let greeting = '';
+            if (hours < 5) {
+                greeting = t.greetings.night;
+            } else if (hours < 9) {
+                greeting = t.greetings.morning;
+            } else if (hours < 12) {
+                greeting = t.greetings.morning;
+            } else if (hours < 14) {
+                greeting = t.greetings.afternoon;
+            } else if (hours < 18) {
+                greeting = t.greetings.afternoon;
+            } else {
+                greeting = t.greetings.evening;
+            }
+
+            const userName = getUserName();
+            document.getElementById('greeting').textContent = `${greeting}${userName ? `，${userName}` : ''}${lang === 'zh-CN' ? '！' : '!'}`;
+        }
+
+        // 获取用户名 (简化版)
+        function getUserName() {
+            return '用户';
+        }
+
+        // 渲染快速链接
+        function renderQuickLinks() {
+            const container = document.getElementById('quickLinksContainer');
+            container.innerHTML = '';
+
+            config.quickLinks.forEach((link, index) => {
+                const linkElement = document.createElement('a');
+                linkElement.className = 'quick-link';
+                linkElement.href = link.url;
+                linkElement.target = '_blank';
+                linkElement.setAttribute('data-index', index);
+                linkElement.innerHTML = `
+                    <div class="link-icon">
+                        <i class="fas fa-${link.icon}"></i>
+                    </div>
+                    <div class="link-name">${link.name}</div>
+                    <div class="link-delete">
+                        <i class="fas fa-times"></i>
+                    </div>
+                `;
+                container.appendChild(linkElement);
+            });
+        }
+
+        // 渲染待办事项
+        function renderTodos() {
+            const container = document.getElementById('todoListContainer');
+            container.innerHTML = '';
+
+            config.todos.forEach((todo, index) => {
+                const todoElement = document.createElement('div');
+                todoElement.className = 'todo-item';
+                todoElement.innerHTML = `
+                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} data-index="${index}">
+                    <span class="todo-text ${todo.completed ? 'completed' : ''}">${todo.text}</span>
+                    <i class="fas fa-trash todo-delete" data-index="${index}"></i>
+                `;
+                container.appendChild(todoElement);
+            });
+
+            // 添加事件监听
+            document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    config.todos[index].completed = this.checked;
+                    if (this.checked) {
+                        config.stats.tasksCompleted++;
+                    }
+                    saveSettings();
+                    renderTodos();
+                });
+            });
+
+            document.querySelectorAll('.todo-delete').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    config.todos.splice(index, 1);
+                    saveSettings();
+                    renderTodos();
+                });
+            });
+        }
+
+        // 更新统计显示
+        function updateStats() {
+            document.getElementById('daysUsed').textContent = config.stats.daysUsed;
+            document.getElementById('tasksCompleted').textContent = config.stats.tasksCompleted;
+            document.getElementById('linksAdded').textContent = config.stats.linksAdded;
+            document.getElementById('searchesMade').textContent = config.stats.searchesMade;
+        }
+
+        // 初始化搜索引擎
+        function initSearchEngines() {
+            const engines = document.querySelectorAll('.search-engine');
+            engines.forEach(engine => {
+                engine.addEventListener('click', function () {
+                    document.querySelector('.search-engine.active').classList.remove('active');
+                    this.classList.add('active');
+                    config.currentSearchEngine = this.getAttribute('data-engine');
+                    saveSettings();
+                });
+
+                // 设置当前激活的搜索引擎
+                if (engine.getAttribute('data-engine') === config.currentSearchEngine) {
+                    engine.classList.add('active');
+                }
+            });
+        }
+
+        // 获取天气信息
+        async function fetchWeather(location = 'Beijing') {
+            try {
+                // 这里使用模拟数据，实际应用中应该调用天气API
+                const mockWeather = {
+                    name: '北京',
+                    sys: { country: '中国' },
+                    main: { temp: 22 },
+                    weather: [{ description: '局部多云', id: 801 }]
+                };
+
+                document.getElementById('weatherLocation').textContent = `${mockWeather.name}, ${mockWeather.sys.country}`;
+                document.querySelector('.weather-temp').textContent = `${Math.round(mockWeather.main.temp)}°C`;
+                document.querySelector('.weather-desc').textContent = mockWeather.weather[0].description;
+
+                // 根据天气代码设置图标
+                const weatherIcon = getWeatherIcon(mockWeather.weather[0].id);
+                document.querySelector('.weather-icon').innerHTML = `<i class="fas fa-${weatherIcon}"></i>`;
+            } catch (error) {
+                console.error('获取天气失败:', error);
+                showToast(getTranslation('weatherFailed'));
+            }
+        }
+
+        function getWeatherIcon(weatherCode) {
+            if (weatherCode >= 200 && weatherCode < 300) return 'bolt';
+            if (weatherCode >= 300 && weatherCode < 600) return 'cloud-rain';
+            if (weatherCode >= 600 && weatherCode < 700) return 'snowflake';
+            if (weatherCode === 800) return 'sun';
+            if (weatherCode > 800) return 'cloud';
+            return 'cloud-sun';
+        }
+
+        // 刷新天气
+        function refreshWeather() {
+            showToast(getTranslation('weatherUpdating'));
+            fetchWeather();
+        }
+
+        // 设置事件监听
+        function setupEventListeners() {
+            // 设置按钮点击事件
+            document.getElementById('settingsBtn').addEventListener('click', function () {
+                document.getElementById('settingsModal').classList.add('active');
+            });
+
+            // 关闭设置模态框
+            document.getElementById('closeSettingsModal').addEventListener('click', function () {
+                document.getElementById('settingsModal').classList.remove('active');
+            });
+
+            // 保存设置按钮
+            document.getElementById('saveSettingsBtn').addEventListener('click', function () {
+                saveSettings();
+                document.getElementById('settingsModal').classList.remove('active');
+            });
+
+            // 重置设置按钮
+            document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
+
+            // 主题预设更改
+            document.getElementById('themePreset').addEventListener('change', function () {
+                if (this.value === 'custom') {
+                    document.getElementById('customThemeOptions').style.display = 'block';
+                } else {
+                    document.getElementById('customThemeOptions').style.display = 'none';
+                }
+            });
+
+            // 背景类型更改
+            document.getElementById('bgType').addEventListener('change', function () {
+                if (this.value === 'image' || this.value === 'dynamic') {
+                    document.getElementById('bgImageOptions').style.display = 'block';
+                } else {
+                    document.getElementById('bgImageOptions').style.display = 'none';
+                }
+            });
+
+            // 添加待办事项
+            document.getElementById('addTodoBtn').addEventListener('click', addTodo);
+            document.getElementById('newTodoInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') addTodo();
+            });
+
+            // 清除已完成任务
+            document.getElementById('clearCompletedBtn').addEventListener('click', clearCompletedTodos);
+
+            // 保存笔记
+            document.getElementById('saveNoteBtn').addEventListener('click', saveNote);
+            document.getElementById('quickNote').addEventListener('input', function () {
+                config.note = this.value;
+            });
+
+            // 搜索功能
+            document.getElementById('searchInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') performSearch();
+            });
+
+            // 编辑链接
+            document.getElementById('editLinksBtn').addEventListener('click', toggleEditLinksMode);
+
+            // 刷新天气
+            document.getElementById('refreshWeatherBtn').addEventListener('click', refreshWeather);
+
+            // 新名言
+            document.getElementById('newQuoteBtn')?.addEventListener('click', showRandomQuote);
+
+            // 导出设置按钮
+            document.getElementById('exportSettingsBtn').addEventListener('click', exportSettings);
+
+            // 导入设置按钮
+            document.getElementById('importSettingsBtn').addEventListener('click', function () {
+                document.getElementById('settingsFile').click();
+            });
+
+            // 文件选择变化
+            document.getElementById('settingsFile').addEventListener('change', function (e) {
+                if (e.target.files.length > 0) {
+                    importSettings(e.target.files[0]);
+                    e.target.value = ''; // 重置文件输入
+                }
+            });
+        }
+
+        // 添加待办事项
+        function addTodo() {
+            const input = document.getElementById('newTodoInput');
+            const text = input.value.trim();
+            if (text) {
+                config.todos.push({ text, completed: false });
+                input.value = '';
+                saveSettings();
+                renderTodos();
+            }
+        }
+
+        // 清除已完成任务
+        function clearCompletedTodos() {
+            config.todos = config.todos.filter(todo => !todo.completed);
+            saveSettings();
+            renderTodos();
+        }
+
+        // 保存笔记
+        function saveNote() {
+            config.note = document.getElementById('quickNote').value;
+            saveSettings();
+            showToast(getTranslation('noteSaved'));
+        }
+
+        // 执行搜索
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query) {
+                config.stats.searchesMade++;
+                saveSettings();
+
+                if (query.includes('.') && !query.includes(' ')) {
+                    // 可能是网址
+                    const url = query.startsWith('http') ? query : `https://${query}`;
+                    window.open(url, '_blank');
+                } else {
+                    // 搜索
+                    window.open(config.currentSearchEngine + encodeURIComponent(query), '_blank');
+                }
+            }
+        }
+
+        // 切换编辑链接模式
+        function toggleEditLinksMode() {
+            const container = document.getElementById('quickLinksContainer');
+            const isEditing = container.classList.toggle('edit-mode');
+
+            if (isEditing) {
+                // 添加"添加链接"按钮
+                const addBtn = document.createElement('div');
+                addBtn.className = 'quick-link add-link';
+                addBtn.innerHTML = `
+                    <div class="link-icon"><i class="fas fa-plus"></i></div>
+                    <div class="link-name">${getTranslation('addLink')}</div>
+                `;
+                addBtn.addEventListener('click', showAddLinkModal);
+                container.appendChild(addBtn);
+            } else {
+                renderQuickLinks();
+            }
+        }
+
+        // 显示添加链接模态框
+        function showAddLinkModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>${getTranslation('addQuickLink')}</h3>
+                    <div class="form-group">
+                        <label>${getTranslation('linkName')}</label>
+                        <input type="text" id="linkName" placeholder="${getTranslation('linkName')}">
+                    </div>
+                    <div class="form-group">
+                        <label>${getTranslation('linkUrl')}</label>
+                        <input type="text" id="linkUrl" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>${getTranslation('linkIcon')}</label>
+                        <select id="linkIcon">
+                            <option value="globe">${getTranslation('website')}</option>
+                            <option value="envelope">${getTranslation('email')}</option>
+                            <option value="play">${getTranslation('video')}</option>
+                            <option value="music">${getTranslation('music')}</option>
+                            <option value="shopping-cart">${getTranslation('shopping')}</option>
+                            <option value="gamepad">${getTranslation('games')}</option>
+                            <option value="newspaper">${getTranslation('news')}</option>
+                            <option value="code">${getTranslation('development')}</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-cancel">${getTranslation('cancel')}</button>
+                        <button class="btn btn-confirm">${getTranslation('confirm')}</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            modal.querySelector('.btn-cancel').addEventListener('click', () => modal.remove());
+            modal.querySelector('.btn-confirm').addEventListener('click', () => {
+                const name = document.getElementById('linkName').value.trim();
+                const url = document.getElementById('linkUrl').value.trim();
+                const icon = document.getElementById('linkIcon').value;
+
+                if (name && url) {
+                    // 验证URL格式
+                    let finalUrl = url;
+                    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                        finalUrl = 'https://' + url;
+                    }
+
+                    config.quickLinks.push({ name, url: finalUrl, icon });
+                    config.stats.linksAdded++;
+                    saveSettings();
+                    renderQuickLinks();
+                    modal.remove();
+
+                    // 重新进入编辑模式
+                    toggleEditLinksMode();
+                } else {
+                    showToast(getTranslation('invalidLink'));
+                }
+            });
+        }
+
+        // 显示随机名言
+        function showRandomQuote() {
+            const quotes = [
+                { text: "Stay hungry, stay foolish.", author: "Steve Jobs" },
+                { text: "代码胜于雄辩。", author: "Linus Torvalds" },
+                { text: "简单是可靠的先决条件。", author: "Edsger W. Dijkstra" },
+                { text: "测量两次，切割一次。", author: "程序员谚语" },
+                { text: "过早优化是万恶之源。", author: "Donald Knuth" },
+                { text: "The best way to predict the future is to invent it.", author: "Alan Kay" },
+                { text: "Talk is cheap. Show me the code.", author: "Linus Torvalds" }
+            ];
+
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('dailyQuote').textContent = `"${randomQuote.text}"`;
+            document.getElementById('quoteAuthor').textContent = `— ${randomQuote.author}`;
+        }
+
+        // 显示Toast通知
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // 初始化拖拽排序
+        function initDragAndDrop() {
+            const container = document.querySelector('.main-content');
+            let draggedItem = null;
+
+            container.querySelectorAll('.card').forEach(card => {
+                card.draggable = true;
+
+                card.addEventListener('dragstart', function (e) {
+                    draggedItem = this;
+                    setTimeout(() => this.style.opacity = '0.4', 0);
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', this.innerHTML);
+                });
+
+                card.addEventListener('dragend', function () {
+                    setTimeout(() => this.style.opacity = '1', 0);
+                    draggedItem = null;
+                });
+
+                card.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    return false;
+                });
+
+                card.addEventListener('dragenter', function (e) {
+                    e.preventDefault();
+                    this.classList.add('card-placeholder');
+                });
+
+                card.addEventListener('dragleave', function () {
+                    this.classList.remove('card-placeholder');
+                });
+
+                card.addEventListener('drop', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    this.classList.remove('card-placeholder');
+
+                    if (draggedItem !== this) {
+                        // 交换两个卡片的位置
+                        const allCards = Array.from(container.querySelectorAll('.card'));
+                        const draggedIndex = allCards.indexOf(draggedItem);
+                        const targetIndex = allCards.indexOf(this);
+
+                        if (draggedIndex < targetIndex) {
+                            container.insertBefore(draggedItem, this.nextSibling);
+                        } else {
+                            container.insertBefore(draggedItem, this);
+                        }
+
+                        // 保存新的卡片顺序
+                        saveSettings();
+                    }
+                    return false;
+                });
+            });
+        }
+
+        // 检查使用天数
+        function checkUsageDays() {
+            const today = new Date().toISOString().split('T')[0];
+            if (today !== config.stats.lastUsed) {
+                config.stats.daysUsed++;
+                config.stats.lastUsed = today;
+                saveSettings();
+                updateStats();
+            }
+        }
+        // 获取用户地理位置信息
+        async function getUserLocation() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                return {
+                    city: data.city,
+                    region: data.region,
+                    country: data.country_name
+                };
+            } catch (error) {
+                console.error('获取地理位置信息失败:', error);
+                return null;
+            }
+        }
+
+        // 更新地区显示
+        async function updateLocationDisplay() {
+            const locationElement = document.getElementById('userLocation');
+            if (!locationElement) return;
+
+            const location = await getUserLocation();
+            if (location) {
+                locationElement.textContent = `${location.city}, ${location.region}, ${location.country}`;
+                locationElement.style.display = 'block';
+            } else {
+                locationElement.style.display = 'none';
+            }
+        }
+
+        // 页面加载完成后更新地区信息
+        document.addEventListener('DOMContentLoaded', updateLocationDisplay);
+    </script>
+</body>
+
+</html>
