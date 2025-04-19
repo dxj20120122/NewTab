@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索</title>
+    <style>
+        :root {
+            --background: #ffffff;
+            --text: #333333;
+            --search-bg: #f1f3f4;
+            --search-hover: #e8eaeb;
+            --search-focus: #ffffff;
+            --shadow: rgba(32, 33, 36, 0.28);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #202124;
+                --text: #e8eaed;
+                --search-bg: #303134;
+                --search-hover: #3c4043;
+                --search-focus: #303134;
+                --shadow: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .search-container {
+            width: 90%;
+            max-width: 584px;
+            margin: 0 auto;
+            position: relative;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-container.focused {
+            transform: translateY(-30px);
+        }
+
+        .history-panel {
+            position: relative;
+            width: 100%;
+            background-color: var(--search-bg);
+            border-radius: 24px;
+            box-shadow: 0 2px 6px var(--shadow);
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid var(--text);
+            margin-top: -2px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            display: block;
+            pointer-events: none;
+        }
+
+        .search-box:focus-within + .history-panel,
+        .history-panel.show {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-top: none;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .history-panel.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid var(--text);
+            margin-top: -2px;
+            z-index: 1000;
+        }
+
+        .search-box:focus-within+.history-panel.show {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-top: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-box:focus-within {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            z-index: 1001;
+            position: relative;
+        }
+
+        .history-panel.show {
+            display: block;
+        }
+
+        .history-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: var(--text);
+        }
+
+        .history-item:hover {
+            background-color: var(--search-hover);
+        }
+
+        .history-item svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 12px;
+            fill: var(--text);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: var(--search-bg);
+            border: 1px solid transparent;
+            border-radius: 24px;
+            padding: 8px 16px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .search-box:hover {
+            background-color: var(--search-hover);
+            box-shadow: 0 1px 6px var(--shadow);
+        }
+
+        .search-box:focus-within {
+            background-color: var(--search-focus);
+            box-shadow: 0 2px 8px var(--shadow);
+            border: 2px solid var(--text);
+            padding: 7px 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 8px;
+            font-size: 16px;
+            color: var(--text);
+            outline: none;
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            fill: var(--text);
+        }
+
+        @media (max-width: 480px) {
+            .search-container {
+                width: 95%;
+            }
+        }
+
+        .logo {
+            font-size: 60px;
+            font-weight: bold;
+            margin-bottom: 24px;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+    </style>
+</head>
+
+<body>
+    <div class="search-container">
+        <div class="logo">Simple</div>
+        <form class="search-box" id="search-form">
+            <input type="text" class="search-input" placeholder="输入搜索内容..." autofocus>
+            <svg class="search-icon" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                    d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                </path>
+            </svg>
+        </form>
+        <div class="history-panel" id="history-panel"></div>
+    </div>
+
+    <script>
+        // 获取搜索历史记录
+        function getSearchHistory() {
+            return JSON.parse(localStorage.getItem('searchHistory') || '[]');
+        }
+
+        // 保存搜索历史记录
+        function saveSearchHistory(query) {
+            let history = getSearchHistory();
+            // 移除重复的查询
+            history = history.filter(item => item !== query);
+            // 将新查询添加到开头
+            history.unshift(query);
+            // 只保留最近的10条记录
+            history = history.slice(0, 10);
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+            updateHistoryPanel();
+        }
+
+        // 更新历史记录面板
+        function updateHistoryPanel() {
+            const historyPanel = document.getElementById('history-panel');
+            const history = getSearchHistory();
+            historyPanel.innerHTML = history.map(query => `
+                <div class="history-item" onclick="event.stopPropagation(); searchQuery('${query.replace(/'/g, "\\'")}')">                    
+                    <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"></path>
+                    </svg>
+                    ${query}
+                </div>
+            `).join('');
+        }
+
+        // 执行搜索
+        function searchQuery(query) {
+            window.open(`https://cn.bing.com/search?q=${encodeURIComponent(query)}`, '_blank');
+            searchInput.value = query;
+            searchInput.focus();
+        }
+
+        // 搜索框焦点事件
+        const searchContainer = document.querySelector('.search-container');
+        const searchInput = document.querySelector('.search-input');
+        const historyPanel = document.getElementById('history-panel');
+
+        searchInput.addEventListener('focus', () => {
+            searchContainer.classList.add('focused');
+            updateHistoryPanel();
+            historyPanel.classList.add('show');
+        });
+
+        searchInput.addEventListener('blur', (e) => {
+            // 给一个短暂的延时，以便点击历史记录项时能够正确触发点击事件
+            setTimeout(() => {
+                if (!historyPanel.contains(document.activeElement)) {
+                    historyPanel.classList.remove('show');
+                    searchContainer.classList.remove('focused');
+                }
+            }, 200);
+        });
+
+        // 点击页面其他地方时隐藏历史记录
+        document.addEventListener('click', (e) => {
+            const logo = document.querySelector('.logo');
+            if (!searchContainer.contains(e.target) && !logo.contains(e.target)) {
+                historyPanel.classList.remove('show');
+                searchContainer.classList.remove('focused');
+            }
+        });
+
+        // 表单提交事件
+        document.getElementById('search-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (query) {
+                searchQuery(query);
+                saveSearchHistory(query);
+            }
+        });
+
+        document.querySelector('.search-icon').addEventListener('click', function () {
+            document.getElementById('search-form').dispatchEvent(new Event('submit'));
+            searchInput.focus();
+        });
+
+        // 初始化历史记录面板
+        updateHistoryPanel();
+    </script>
+</body>
+
+</html>
